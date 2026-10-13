@@ -14,11 +14,16 @@ import orderRoutes from "./routes/order.routes.js";
 dotenv.config();
 
 const app = express();
-const PORT = 8001;
+const PORT = process.env.PORT || 8001;
 
 app.use(cors({
   origin: (origin, callback) => {
-    if (!origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+    if (
+      !origin ||
+      /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin) ||
+      /\.vercel\.app$/.test(origin) ||
+      (process.env.CLIENT_URL && origin === process.env.CLIENT_URL)
+    ) {
       return callback(null, true);
     }
     return callback(new Error("Blocked by CORS"));
@@ -38,16 +43,21 @@ mongoose.connect(dbUrl)
     console.error("DB connection error:", err.message);
   });
 
-app.use("/customers", customerRoutes);
-app.use("/products", productRoutes);
-app.use("/wishlist", wishlistRoutes);
-app.use("/cart", cartRoutes);
-app.use("/orders", orderRoutes);
-
-app.get("/", (req, res) => {
+const apiRouter = express.Router();
+apiRouter.use("/customers", customerRoutes);
+apiRouter.use("/products", productRoutes);
+apiRouter.use("/wishlist", wishlistRoutes);
+apiRouter.use("/cart", cartRoutes);
+apiRouter.use("/orders", orderRoutes);
+apiRouter.get("/", (req, res) => {
   res.json({ msg: "ezshop Service is running" });
 });
+
+app.use("/api", apiRouter);
+app.use("/", apiRouter);
 
 app.listen(PORT, () => {
   console.log(`Server Started at ${PORT}`);
 });
+
+export default app;
