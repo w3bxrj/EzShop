@@ -183,15 +183,21 @@ const Checkout = () => {
           prefill: {
             name: formData.fullName,
             contact: formData.phone,
+            email: orderRes.data.customerEmail || "",
           },
           theme: {
-            color: "#4f46e5",
+            color: "#000000",
           },
         };
 
         const rzp = new window.Razorpay(options);
-        rzp.on("payment.failed", function () {
-          setServerError("Payment was cancelled or failed. Your cart is preserved.");
+        rzp.on("payment.failed", function (response) {
+          console.error("Razorpay payment failure event:", response?.error);
+          const errorMsg =
+            response?.error?.description ||
+            response?.error?.reason ||
+            "Payment was cancelled or failed. Your cart is preserved.";
+          setServerError(`Payment Failed: ${errorMsg}`);
           setLoading(false);
         });
         rzp.open();
@@ -423,9 +429,19 @@ const Checkout = () => {
               )}
             </div>
 
-            <div className="pt-2 text-xs text-slate-500 flex items-center gap-2">
-              <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
-              <span>Razorpay Test Mode Active: No real money will be charged.</span>
+            <div className="p-3.5 bg-neutral-50 rounded-2xl border border-neutral-200 text-xs text-neutral-600 space-y-1.5 mt-2">
+              <div className="font-extrabold text-neutral-900 flex items-center gap-1.5">
+                <ShieldCheck size={16} className="text-emerald-600 shrink-0" />
+                <span>Razorpay Test Mode Active</span>
+              </div>
+              <p className="text-[11px] text-neutral-500">
+                Real banking apps will fail in test mode. To test successfully:
+              </p>
+              <ul className="text-[11px] list-disc list-inside space-y-0.5 text-neutral-600">
+                <li><strong>Card:</strong> <code>4111 1111 1111 1111</code>, expiry <code>12/28</code>, CVV <code>123</code> &rarr; click <strong>Success</strong> on OTP popup</li>
+                <li><strong>UPI:</strong> Enter <code>success@razorpay</code> as UPI ID</li>
+                <li><strong>Netbanking:</strong> Select any bank &rarr; click <strong>Success</strong></li>
+              </ul>
             </div>
           </form>
         </div>

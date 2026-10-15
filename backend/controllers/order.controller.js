@@ -127,22 +127,32 @@ export const createPaymentOrder = async (req, res) => {
     await shopKartOrder.save();
 
     const amountInPaise = Math.round(serverTotalAmount * 100);
+    const hasRealKeys =
+      process.env.RAZORPAY_KEY_ID &&
+      !process.env.RAZORPAY_KEY_ID.includes("placeholder") &&
+      process.env.RAZORPAY_KEY_SECRET &&
+      !process.env.RAZORPAY_KEY_SECRET.includes("placeholder");
+
     let razorpayOrderId = `order_sim_${shopKartOrder._id}`;
 
-    try {
-      if (
-        process.env.RAZORPAY_KEY_ID &&
-        !process.env.RAZORPAY_KEY_ID.includes("placeholder")
-      ) {
+    if (hasRealKeys) {
+      try {
         const rzpOrder = await razorpay.orders.create({
           amount: amountInPaise,
           currency: "INR",
           receipt: shopKartOrder._id.toString(),
         });
         razorpayOrderId = rzpOrder.id;
+      } catch (err) {
+        console.error("Razorpay order creation failed:", err);
+        return res.status(502).json({
+          success: false,
+          message:
+            err?.error?.description ||
+            err?.message ||
+            "Failed to initiate order with Razorpay. Please verify API keys.",
+        });
       }
-    } catch {
-      razorpayOrderId = `order_${Date.now()}_${shopKartOrder._id.toString().slice(-6)}`;
     }
 
     shopKartOrder.razorpayOrderId = razorpayOrderId;
@@ -154,10 +164,12 @@ export const createPaymentOrder = async (req, res) => {
       razorpayOrderId,
       amount: amountInPaise,
       currency: "INR",
-      key: process.env.RAZORPAY_KEY_ID || "rzp_test_placeholder_key",
+      key: hasRealKeys ? process.env.RAZORPAY_KEY_ID : "rzp_test_placeholder_key",
       totalAmount: serverTotalAmount,
+      customerEmail: customer.email,
     });
   } catch (error) {
+    console.error("Order creation internal error:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error while creating payment order",
