@@ -14,6 +14,7 @@ import orderRoutes from "./routes/order.routes.js";
 dotenv.config();
 
 const app = express();
+app.set("trust proxy", 1);
 const PORT = process.env.PORT || 8001;
 
 app.use(cors({
