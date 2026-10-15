@@ -104,11 +104,10 @@ const Navbar = () => {
                 key={link.to}
                 to={link.to}
                 id={link.id}
-                className={`relative text-xs uppercase font-extrabold tracking-wider transition-colors py-1 ${
-                  link.active
+                className={`relative text-xs uppercase font-extrabold tracking-wider transition-colors py-1 ${link.active
                     ? "text-black border-b-2 border-black"
                     : "text-neutral-500 hover:text-black"
-                }`}
+                  }`}
               >
                 {link.label}
               </Link>

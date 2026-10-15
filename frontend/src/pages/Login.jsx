@@ -171,7 +171,7 @@ const Login = () => {
               })}
             </div>
           </div>
-          
+
         </motion.div>
 
         <motion.div
@@ -200,7 +200,7 @@ const Login = () => {
             <p className="text-xs sm:text-sm text-neutral-500 font-medium mt-2">
               Sign in with your email to access your bag, saved favorites, and order history.
             </p>
-            
+
           </div>
 
           <AnimatePresence>
@@ -248,11 +248,10 @@ const Login = () => {
                 Email Address
               </label>
               <div
-                className={`relative flex items-center rounded-2xl border transition-all ${
-                  errors.email
+                className={`relative flex items-center rounded-2xl border transition-all ${errors.email
                     ? "border-red-400 bg-red-50/30"
                     : "border-neutral-200 bg-neutral-50/50 focus-within:border-black focus-within:bg-white focus-within:ring-2 focus-within:ring-black/5"
-                }`}
+                  }`}
               >
                 <Mail className="absolute left-3.5 text-neutral-400 pointer-events-none" size={17} />
                 <input
@@ -279,11 +278,10 @@ const Login = () => {
                 </label>
               </div>
               <div
-                className={`relative flex items-center rounded-2xl border transition-all ${
-                  errors.password
+                className={`relative flex items-center rounded-2xl border transition-all ${errors.password
                     ? "border-red-400 bg-red-50/30"
                     : "border-neutral-200 bg-neutral-50/50 focus-within:border-black focus-within:bg-white focus-within:ring-2 focus-within:ring-black/5"
-                }`}
+                  }`}
               >
                 <Lock className="absolute left-3.5 text-neutral-400 pointer-events-none" size={17} />
                 <input
